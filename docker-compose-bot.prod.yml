@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  fitness_bot:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env/production/fitness_bot
+    restart: unless-stopped
+    networks:
+      - fit
+
+networks:
+  fit:
+    driver: bridge
+    attachable: true
