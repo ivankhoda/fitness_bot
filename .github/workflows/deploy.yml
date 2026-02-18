@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and push image
         run: |
-          docker build -f Dockerfile.prod \
+          docker build -f Dockerfile \
             -t ivankhoda/fitness:fitness_bot-${{ github.sha }} .
           docker push ivankhoda/fitness:fitness_bot-${{ github.sha }}
 
