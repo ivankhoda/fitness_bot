@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - EXTERNAL_PROVIDER_URL=${EXTERNAL_PROVIDER_URL}
+    restart: unless-stopped
+    networks:
+      - fit
