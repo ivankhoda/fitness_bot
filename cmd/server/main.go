@@ -15,7 +15,8 @@ func main() {
 	// 	return
 	// }
 	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/api/exercises")
-
+	log.Printf("External provider URL: %s", os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/api/exercises")
+	log.Printf("Bot token: %s", os.Getenv("BOT_TOKEN"))
 	workoutBuilder := workouts.NewWorkoutBuilder(client)
 	workoutHandler := workouts.NewWorkoutHandler(workoutBuilder)
 
