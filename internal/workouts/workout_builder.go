@@ -2,6 +2,7 @@ package workouts
 
 import (
 	"fitness_bot/internal/exercises"
+	exercisespkg "fitness_bot/internal/exercises"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -28,20 +29,32 @@ func (b *WorkoutBuilder) BuildWorkout(r *http.Request) (Workout, error) {
 	if len(exercises) < exercisesSize {
 		exercisesSize = len(exercises)
 	}
-	for i := 0; i < exercisesSize; i++ {
 
-		randomIndex := rand.Intn(len(exercises))
-		pick := exercises[randomIndex]
-		workout.Exercises = append(workout.Exercises, pick)
-		fmt.Println(pick)
-	}
-	workout.Type = b.DefineType(exercises)
-	workout.Difficulty = b.DefineDifficulty(exercises)
+	workout.Exercises = b.PickUniqueExercises(exercises, exercisesSize)
+
+	workout.Type = b.DefineType(workout.Exercises)
+	workout.Difficulty = b.DefineDifficulty(workout.Exercises)
 	return workout, nil
 }
 
 func NewWorkoutBuilder(client exercises.ExercisesFetcher) *WorkoutBuilder {
 	return &WorkoutBuilder{client: client}
+}
+
+func (b *WorkoutBuilder) PickUniqueExercises(exercises []exercisespkg.ExerciseRecord, count int) []exercises.ExerciseRecord {
+	uniqueExercises := make(map[string]exercisespkg.ExerciseRecord)
+	for len(uniqueExercises) < count && len(uniqueExercises) < len(exercises) {
+		randomIndex := rand.Intn(len(exercises))
+		pick := exercises[randomIndex]
+
+		uniqueExercises[pick.UUID] = pick
+	}
+
+	result := make([]exercisespkg.ExerciseRecord, 0, len(uniqueExercises))
+	for _, exercise := range uniqueExercises {
+		result = append(result, exercise)
+	}
+	return result
 }
 
 func (b *WorkoutBuilder) DefineType(exercises []exercises.ExerciseRecord) string {
