@@ -1,0 +1,138 @@
+{{/*
+Partial: POST endpoint card
+───────────────────────────
+Usage:
+
+{{template "endpoint-post" dict
+"Path" "/resource"
+"AnchorID" "create-resource"
+"Desc" "Creates a new resource."
+"AuthRequired" true
+"RequestFields" (list
+(dict "Name" "name" "Type" "string" "Required" true "Desc" "Resource name.")
+(dict "Name" "tags" "Type" "string[]" "Required" false "Desc" "Optional tags.")
+)
+"ResponseFields" (list
+(dict "Name" "id" "Type" "string" "Desc" "UUID of the created resource.")
+(dict "Name" "name" "Type" "string" "Desc" "Resource name.")
+)
+"ExampleRequest" "{\"name\": \"My resource\", \"tags\": [\"foo\"]}"
+"ExampleResponse" "{\"id\": \"uuid-...\", \"name\": \"My resource\"}"
+"Errors" (list
+(dict "Status" "400" "Body" "bad request" "Reason" "Missing or invalid fields.")
+(dict "Status" "500" "Body" "internal error" "Reason" "Server-side failure.")
+)
+"Lang" .Lang
+}}
+*/}}
+
+{{define "endpoint-post"}}
+<div class="endpoint" id="{{.AnchorID}}">
+
+  <div class="endpoint-header">
+    <span class="method method-post">POST</span>
+    <span class="path">{{.Path}}</span>
+  </div>
+
+  <div class="endpoint-desc">{{.Desc}}</div>
+
+  {{if .AuthRequired}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Аутентификация{{else}}Authentication{{end}}</div>
+    <span class="auth-badge">🔑 Bearer Token — Authorization</span>
+  </div>
+  {{end}}
+
+  {{if .RequestFields}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Тело запроса (JSON){{else}}Request Body (JSON){{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Поле{{else}}Field{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Обязательное{{else}}Required{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .RequestFields}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td class="{{if .Required}}req{{else}}opt{{end}}">
+            {{if .Required}}{{if eq $.Lang "ru"}}да{{else}}required{{end}}{{else}}{{if eq $.Lang
+            "ru"}}нет{{else}}optional{{end}}{{end}}
+          </td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .ExampleRequest}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Пример запроса{{else}}Example Request{{end}}</div>
+  </div>
+  <pre>{{.ExampleRequest}}</pre>
+  {{end}}
+
+  {{if .ResponseFields}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Ответ — 201 Created{{else}}Response — 201 Created{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Поле{{else}}Field{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .ResponseFields}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .ExampleResponse}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Пример ответа{{else}}Example Response{{end}}</div>
+  </div>
+  <pre>{{.ExampleResponse}}</pre>
+  {{end}}
+
+  {{if .Errors}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Коды ошибок{{else}}Error Responses{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Статус{{else}}Status{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тело{{else}}Body{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Причина{{else}}Reason{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Errors}}
+        <tr>
+          <td><code>{{.Status}}</code></td>
+          <td>{{.Body}}</td>
+          <td>{{.Reason}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+</div>
+{{end}}{{/* endpoint-post */}}

@@ -1,0 +1,329 @@
+{{define "base"}}
+<!doctype html>
+<html lang="{{.Lang}}">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{block "title" .}}Планка — API{{end}}</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+    }
+
+    header p {
+      opacity: .7;
+      font-size: .9rem;
+      margin-top: .25rem;
+    }
+
+    /* ── Lang switcher ── */
+    .lang-switcher {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    .lang-switcher a {
+      color: rgba(255, 255, 255, .6);
+      text-decoration: none;
+      font-size: .85rem;
+      padding: .2rem .55rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      transition: background .15s, color .15s;
+    }
+
+    .lang-switcher a:hover,
+    .lang-switcher a.active {
+      background: rgba(255, 255, 255, .15);
+      color: #fff;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      max-width: 1060px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      gap: 2rem;
+    }
+
+    nav.sidebar {
+      flex: 0 0 200px;
+      position: sticky;
+      top: 1rem;
+      align-self: flex-start;
+    }
+
+    nav.sidebar h3 {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #6c757d;
+      margin-bottom: .6rem;
+    }
+
+    nav.sidebar ul {
+      list-style: none;
+    }
+
+    nav.sidebar li+li {
+      margin-top: .3rem;
+    }
+
+    nav.sidebar a {
+      font-size: .88rem;
+      color: #495057;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    nav.sidebar a:hover {
+      color: #1a1a2e;
+    }
+
+    nav.sidebar .badge {
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .1rem .4rem;
+      border-radius: 3px;
+      color: #fff;
+    }
+
+    .badge-get {
+      background: #198754;
+    }
+
+    .badge-post {
+      background: #0d6efd;
+    }
+
+    .badge-put {
+      background: #fd7e14;
+    }
+
+    .badge-patch {
+      background: #6f42c1;
+    }
+
+    .badge-delete {
+      background: #dc3545;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── Section heading ── */
+    h2 {
+      font-size: 1.25rem;
+      margin: 2rem 0 .75rem;
+      color: #1a1a2e;
+    }
+
+    h2:first-child {
+      margin-top: 0;
+    }
+
+    /* ── Endpoint card ── */
+    .endpoint {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .method {
+      font-weight: 700;
+      font-size: .8rem;
+      padding: .2rem .55rem;
+      border-radius: 4px;
+      letter-spacing: .05em;
+      color: #fff;
+    }
+
+    .method-get {
+      background: #198754;
+    }
+
+    .method-post {
+      background: #0d6efd;
+    }
+
+    .method-put {
+      background: #fd7e14;
+    }
+
+    .method-patch {
+      background: #6f42c1;
+    }
+
+    .method-delete {
+      background: #dc3545;
+    }
+
+    .path {
+      font-family: monospace;
+      font-size: 1rem;
+      color: #1a1a2e;
+    }
+
+    .endpoint-desc {
+      padding: 1rem 1.25rem;
+      color: #495057;
+      border-bottom: 1px solid #f1f3f5;
+    }
+
+    /* ── Sections inside card ── */
+    .section {
+      padding: .75rem 1.25rem;
+    }
+
+    .section+.section {
+      border-top: 1px solid #f1f3f5;
+    }
+
+    .section-title {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #6c757d;
+      margin-bottom: .5rem;
+    }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: .4rem .6rem;
+    }
+
+    th {
+      color: #6c757d;
+      font-weight: 600;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    td code {
+      background: #f1f3f5;
+      padding: .1rem .35rem;
+      border-radius: 3px;
+      font-size: .85rem;
+    }
+
+    td.opt {
+      color: #adb5bd;
+      font-style: italic;
+    }
+
+    td.req {
+      color: #dc3545;
+      font-weight: 600;
+    }
+
+    /* ── Code block ── */
+    pre {
+      background: #1a1a2e;
+      color: #e2e8f0;
+      padding: 1rem 1.25rem;
+      font-size: .85rem;
+      overflow-x: auto;
+    }
+
+    /* ── Auth badge ── */
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: #fff3cd;
+      color: #664d03;
+      font-size: .8rem;
+      padding: .25rem .6rem;
+      border-radius: 4px;
+      border: 1px solid #ffe69c;
+    }
+
+    footer {
+      text-align: center;
+      font-size: .8rem;
+      color: #6c757d;
+      padding: 2rem 0 3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div>
+      <h1>Планка — API</h1>
+      <p>{{block "subtitle" .}}REST API reference{{end}}</p>
+    </div>
+    <nav class="lang-switcher">
+      <a href="?lang=en" {{if eq .Lang "en" }} class="active" {{end}}>EN</a>
+      <a href="?lang=ru" {{if eq .Lang "ru" }} class="active" {{end}}>RU</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <h3>{{block "nav-title" .}}Endpoints{{end}}</h3>
+      {{block "nav" .}}{{end}}
+    </nav>
+    <main>
+      {{block "content" .}}{{end}}
+    </main>
+  </div>
+
+  <footer>Planka &copy; {{.Year}}</footer>
+</body>
+
+</html>
+{{end}}

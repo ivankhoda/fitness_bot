@@ -1,0 +1,387 @@
+{{template "base" .}}
+
+{{define "title"}} Планка — API Docs{{end}}
+
+{{define "subtitle"}}
+{{if eq .Lang "ru"}}Справочник REST API для сервиса генерации тренировок{{else}}REST API reference for the workout
+generation service{{end}}
+{{end}}
+
+{{define "nav-title"}}{{if eq .Lang "ru"}}Эндпоинты{{else}}Endpoints{{end}}{{end}}
+
+{{define "nav"}}
+<ul>
+  <li>
+    <a href="#generate-workout">
+      <span class="badge badge-get">GET</span>
+      /generate_workout
+    </a>
+  </li>
+  {{/* Заготовки для будущих эндпоинтов / Placeholders for future endpoints */}}
+  {{/*
+  <li><a href="#create-workout"><span class="badge badge-post">POST</span> /workouts</a></li>
+  <li><a href="#update-workout"><span class="badge badge-put">PUT</span> /workouts/:id</a></li>
+  <li><a href="#patch-workout"><span class="badge badge-patch">PATCH</span> /workouts/:id</a></li>
+  <li><a href="#delete-workout"><span class="badge badge-delete">DELETE</span> /workouts/:id</a></li>
+  */}}
+</ul>
+{{end}}
+
+{{define "content"}}
+
+{{if eq .Lang "ru"}}
+{{template "docs-ru" .}}
+{{else}}
+{{template "docs-en" .}}
+{{end}}
+
+{{end}}
+
+{{/* ════════════════════════════════════════════
+RUSSIAN
+════════════════════════════════════════════ */}}
+{{define "docs-ru"}}
+
+<h2 id="generate-workout">Генерация тренировки</h2>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method method-get">GET</span>
+    <span class="path">/generate_workout</span>
+  </div>
+  <div class="endpoint-desc">
+    Генерирует тренировку из 3 уникальных упражнений, соответствующих переданным фильтрам.
+    Возвращает тип тренировки, уровень сложности и список выбранных упражнений.
+  </div>
+
+
+  <div class="section">
+    <div class="section-title">Query-параметры</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Параметр</th>
+          <th>Тип</th>
+          <th>Обязательный</th>
+          <th>Описание</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>muscle_groups[]</code></td>
+          <td><code>string[]</code></td>
+          <td class="opt">нет</td>
+          <td>Фильтр по группам мышц (повторяемый). Пример: <code>?muscle_groups[]=chest&amp;muscle_groups[]=back</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>category</code></td>
+          <td><code>string</code></td>
+          <td class="opt">нет</td>
+          <td>Фильтр по категории упражнения (например, <code>strength</code>, <code>cardio</code>).</td>
+        </tr>
+        <tr>
+          <td><code>difficulty</code></td>
+          <td><code>string</code></td>
+          <td class="opt">нет</td>
+          <td>Фильтр по уровню сложности: <code>beginner</code>, <code>intermediate</code>, <code>advanced</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Ответ — 200 OK</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Поле</th>
+          <th>Тип</th>
+          <th>Описание</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>type</code></td>
+          <td><code>string</code></td>
+          <td>Преобладающий тип тренировки.</td>
+        </tr>
+        <tr>
+          <td><code>difficulty</code></td>
+          <td><code>string</code></td>
+          <td>Общий уровень сложности.</td>
+        </tr>
+        <tr>
+          <td><code>exercises</code></td>
+          <td><code>Exercise[]</code></td>
+          <td>Список выбранных упражнений (см. объект ниже).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Объект Exercise</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Поле</th>
+          <th>Тип</th>
+          <th>Описание</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>uuid</code></td>
+          <td><code>string</code></td>
+          <td>Уникальный идентификатор упражнения.</td>
+        </tr>
+        <tr>
+          <td><code>name</code></td>
+          <td><code>string</code></td>
+          <td>Название упражнения.</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td><code>string</code></td>
+          <td>Краткое описание упражнения.</td>
+        </tr>
+        <tr>
+          <td><code>muscle_groups</code></td>
+          <td><code>string[]</code></td>
+          <td>Задействованные группы мышц.</td>
+        </tr>
+        <tr>
+          <td><code>difficulty</code></td>
+          <td><code>string</code></td>
+          <td>Уровень сложности упражнения.</td>
+        </tr>
+        <tr>
+          <td><code>category</code></td>
+          <td><code>string</code></td>
+          <td>Категория упражнения.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <pre>{
+  "type": "strength",
+  "difficulty": "intermediate",
+  "exercises": [
+    {
+      "uuid": "a1b2c3d4-...",
+      "name": "Жим лёжа",
+      "description": "Жим штанги на горизонтальной скамье.",
+      "muscle_groups": ["chest", "triceps"],
+      "difficulty": "intermediate",
+      "category": "strength"
+    }
+  ]
+}</pre>
+
+  <div class="section">
+    <div class="section-title">Коды ошибок</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Статус</th>
+          <th>Тело</th>
+          <th>Причина</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>405</code></td>
+          <td>Method is not allowed</td>
+          <td>Использован метод, отличный от GET.</td>
+        </tr>
+        <tr>
+          <td><code>500</code></td>
+          <td>Error building workout</td>
+          <td>Ошибка запроса к провайдеру или нет доступных упражнений.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{end}}{{/* docs-ru */}}
+
+
+{{/* ════════════════════════════════════════════
+ENGLISH
+════════════════════════════════════════════ */}}
+{{define "docs-en"}}
+
+<h2 id="generate-workout">Generate Workout</h2>
+
+<div class="endpoint">
+  <div class="endpoint-header">
+    <span class="method method-get">GET</span>
+    <span class="path">/generate_workout</span>
+  </div>
+  <div class="endpoint-desc">
+    Generates a randomised workout of 3 unique exercises that match the supplied
+    filters. Returns the workout type, difficulty, and the full list of selected
+    exercises.
+  </div>
+
+  <div class="section">
+    <div class="section-title">Authentication</div>
+    <span class="auth-badge">🔑 Bearer Token — Authorization header</span>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Query Parameters</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>muscle_groups[]</code></td>
+          <td><code>string[]</code></td>
+          <td class="opt">optional</td>
+          <td>Filter by one or more muscle groups (repeatable). Example:
+            <code>?muscle_groups[]=chest&amp;muscle_groups[]=back</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>category</code></td>
+          <td><code>string</code></td>
+          <td class="opt">optional</td>
+          <td>Filter by exercise category (e.g. <code>strength</code>, <code>cardio</code>).</td>
+        </tr>
+        <tr>
+          <td><code>difficulty</code></td>
+          <td><code>string</code></td>
+          <td class="opt">optional</td>
+          <td>Difficulty level: <code>beginner</code>, <code>intermediate</code>, <code>advanced</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Response — 200 OK</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>type</code></td>
+          <td><code>string</code></td>
+          <td>Dominant workout type derived from selected exercises.</td>
+        </tr>
+        <tr>
+          <td><code>difficulty</code></td>
+          <td><code>string</code></td>
+          <td>Overall difficulty derived from selected exercises.</td>
+        </tr>
+        <tr>
+          <td><code>exercises</code></td>
+          <td><code>Exercise[]</code></td>
+          <td>List of selected exercises (see object below).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Exercise Object</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>uuid</code></td>
+          <td><code>string</code></td>
+          <td>Unique identifier of the exercise.</td>
+        </tr>
+        <tr>
+          <td><code>name</code></td>
+          <td><code>string</code></td>
+          <td>Human-readable exercise name.</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td><code>string</code></td>
+          <td>Short description of the exercise.</td>
+        </tr>
+        <tr>
+          <td><code>muscle_groups</code></td>
+          <td><code>string[]</code></td>
+          <td>Muscle groups targeted by this exercise.</td>
+        </tr>
+        <tr>
+          <td><code>difficulty</code></td>
+          <td><code>string</code></td>
+          <td>Difficulty level of the exercise.</td>
+        </tr>
+        <tr>
+          <td><code>category</code></td>
+          <td><code>string</code></td>
+          <td>Category of the exercise (e.g. strength, cardio).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <pre>{
+  "type": "strength",
+  "difficulty": "intermediate",
+  "exercises": [
+    {
+      "uuid": "a1b2c3d4-...",
+      "name": "Bench Press",
+      "description": "Barbell chest press on a flat bench.",
+      "muscle_groups": ["chest", "triceps"],
+      "difficulty": "intermediate",
+      "category": "strength"
+    }
+  ]
+}</pre>
+
+  <div class="section">
+    <div class="section-title">Error Responses</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Body</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>405</code></td>
+          <td>Method is not allowed</td>
+          <td>Non-GET method used.</td>
+        </tr>
+        <tr>
+          <td><code>500</code></td>
+          <td>Error building workout</td>
+          <td>Upstream fetch failed or no exercises available.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{end}}{{/* docs-en */}}

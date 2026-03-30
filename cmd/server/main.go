@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fitness_bot/internal/docs"
 	"fitness_bot/internal/exercises"
 	"fitness_bot/internal/workouts"
 	"log"
@@ -14,13 +15,17 @@ func main() {
 	// 	fmt.Println("Error loading .env file")
 	// 	return
 	// }
-	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/api/exercises")
+	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/exercises")
 
 	workoutBuilder := workouts.NewWorkoutBuilder(client)
 	workoutHandler := workouts.NewWorkoutHandler(workoutBuilder)
+	docsHandler := docs.NewDocsHandler()
 
-	http.Handle("/generate_workout", workoutHandler)
+	mux := http.NewServeMux()
+	mux.Handle("/docs", docsHandler)
+	mux.Handle("/generate_workout", workoutHandler)
+
 	log.Println("Server is running on port 5000...")
-	http.ListenAndServe(":5000", nil)
-
+	err := http.ListenAndServe(":5000", mux)
+	log.Fatal(err)
 }

@@ -1,0 +1,120 @@
+{{/*
+Partial: GET endpoint card
+──────────────────────────
+Usage inside a docs-en / docs-ru define block:
+
+{{template "endpoint-get" dict
+"Method" "GET"
+"Path" "/resource"
+"AnchorID" "list-resource"
+"Desc" "Returns a list of resources."
+"AuthRequired" true
+"QueryParams" (list
+(dict "Name" "filter" "Type" "string" "Required" false "Desc" "Optional filter.")
+)
+"ResponseFields" (list
+(dict "Name" "items" "Type" "object[]" "Desc" "Array of returned objects.")
+)
+"ExampleJSON" "{\"items\": []}"
+"Errors" (list
+(dict "Status" "500" "Body" "internal error" "Reason" "Server-side failure.")
+)
+"Lang" .Lang
+}}
+*/}}
+
+{{define "endpoint-get"}}
+<div class="endpoint" id="{{.AnchorID}}">
+
+  <div class="endpoint-header">
+    <span class="method method-get">GET</span>
+    <span class="path">{{.Path}}</span>
+  </div>
+
+  <div class="endpoint-desc">{{.Desc}}</div>
+
+
+
+  {{if .QueryParams}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Query-параметры{{else}}Query Parameters{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Параметр{{else}}Parameter{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Обязательный{{else}}Required{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .QueryParams}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td class="{{if .Required}}req{{else}}opt{{end}}">
+            {{if .Required}}{{if eq $.Lang "ru"}}да{{else}}required{{end}}{{else}}{{if eq $.Lang
+            "ru"}}нет{{else}}optional{{end}}{{end}}
+          </td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .ResponseFields}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Ответ — 200 OK{{else}}Response — 200 OK{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Поле{{else}}Field{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .ResponseFields}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .ExampleJSON}}
+  <pre>{{.ExampleJSON}}</pre>
+  {{end}}
+
+  {{if .Errors}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Коды ошибок{{else}}Error Responses{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Статус{{else}}Status{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тело{{else}}Body{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Причина{{else}}Reason{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Errors}}
+        <tr>
+          <td><code>{{.Status}}</code></td>
+          <td>{{.Body}}</td>
+          <td>{{.Reason}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+</div>
+{{end}}{{/* endpoint-get */}}
