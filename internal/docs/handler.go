@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+//go:embed templates/base.tmpl templates/docs.tmpl templates/partials/*.tmpl
 var templateFS embed.FS
 
 type DocsHandler struct{}
