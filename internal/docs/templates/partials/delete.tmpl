@@ -1,0 +1,97 @@
+{{/*
+Partial: DELETE endpoint card
+─────────────────────────────
+Удаление ресурса / Resource deletion.
+
+Usage:
+
+{{template "endpoint-delete" dict
+"Path" "/resource/:id"
+"AnchorID" "delete-resource"
+"Desc" "Permanently deletes the resource."
+"AuthRequired" true
+"PathParams" (list
+(dict "Name" "id" "Type" "string" "Desc" "UUID of the resource to delete.")
+)
+"Errors" (list
+(dict "Status" "404" "Body" "not found" "Reason" "Resource does not exist.")
+)
+"Lang" .Lang
+}}
+*/}}
+
+{{define "endpoint-delete"}}
+<div class="endpoint" id="{{.AnchorID}}">
+
+  <div class="endpoint-header">
+    <span class="method method-delete">DELETE</span>
+    <span class="path">{{.Path}}</span>
+  </div>
+
+  <div class="endpoint-desc">{{.Desc}}</div>
+
+  {{if .AuthRequired}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Аутентификация{{else}}Authentication{{end}}</div>
+    <span class="auth-badge">🔑 Bearer Token — Authorization</span>
+  </div>
+  {{end}}
+
+  {{if .PathParams}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Параметры пути{{else}}Path Parameters{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Параметр{{else}}Parameter{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .PathParams}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Ответ — 204 No Content{{else}}Response — 204 No Content{{end}}</div>
+    <p style="color:#495057; font-size:.9rem;">
+      {{if eq .Lang "ru"}}Пустое тело ответа. Ресурс успешно удалён.{{else}}Empty response body. Resource successfully
+      deleted.{{end}}
+    </p>
+  </div>
+
+  {{if .Errors}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Коды ошибок{{else}}Error Responses{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Статус{{else}}Status{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тело{{else}}Body{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Причина{{else}}Reason{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Errors}}
+        <tr>
+          <td><code>{{.Status}}</code></td>
+          <td>{{.Body}}</td>
+          <td>{{.Reason}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+</div>
+{{end}}{{/* endpoint-delete */}}

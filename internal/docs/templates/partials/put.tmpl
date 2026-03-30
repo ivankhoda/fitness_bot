@@ -1,0 +1,158 @@
+{{/*
+Partial: PUT endpoint card
+──────────────────────────
+Полная замена ресурса / Full resource replacement.
+
+Usage:
+
+{{template "endpoint-put" dict
+"Path" "/resource/:id"
+"AnchorID" "update-resource"
+"Desc" "Replaces the resource entirely."
+"AuthRequired" true
+"PathParams" (list
+(dict "Name" "id" "Type" "string" "Desc" "UUID of the resource.")
+)
+"RequestFields" (list
+(dict "Name" "name" "Type" "string" "Required" true "Desc" "New resource name.")
+)
+"ResponseFields" (list
+(dict "Name" "id" "Type" "string" "Desc" "UUID.")
+(dict "Name" "name" "Type" "string" "Desc" "Updated name.")
+)
+"ExampleRequest" "{\"name\": \"Updated name\"}"
+"ExampleResponse" "{\"id\": \"uuid-...\", \"name\": \"Updated name\"}"
+"Errors" (list
+(dict "Status" "400" "Body" "bad request" "Reason" "Missing required fields.")
+(dict "Status" "404" "Body" "not found" "Reason" "Resource not found.")
+)
+"Lang" .Lang
+}}
+*/}}
+
+{{define "endpoint-put"}}
+<div class="endpoint" id="{{.AnchorID}}">
+
+  <div class="endpoint-header">
+    <span class="method method-put">PUT</span>
+    <span class="path">{{.Path}}</span>
+  </div>
+
+  <div class="endpoint-desc">{{.Desc}}</div>
+
+  {{if .AuthRequired}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Аутентификация{{else}}Authentication{{end}}</div>
+    <span class="auth-badge">🔑 Bearer Token — Authorization</span>
+  </div>
+  {{end}}
+
+  {{if .PathParams}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Параметры пути{{else}}Path Parameters{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Параметр{{else}}Parameter{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .PathParams}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .RequestFields}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Тело запроса (JSON){{else}}Request Body (JSON){{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Поле{{else}}Field{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Обязательное{{else}}Required{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .RequestFields}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td class="{{if .Required}}req{{else}}opt{{end}}">
+            {{if .Required}}{{if eq $.Lang "ru"}}да{{else}}required{{end}}{{else}}{{if eq $.Lang
+            "ru"}}нет{{else}}optional{{end}}{{end}}
+          </td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .ExampleRequest}}
+  <pre>{{.ExampleRequest}}</pre>{{end}}
+
+  {{if .ResponseFields}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Ответ — 200 OK{{else}}Response — 200 OK{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Поле{{else}}Field{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тип{{else}}Type{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Описание{{else}}Description{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .ResponseFields}}
+        <tr>
+          <td><code>{{.Name}}</code></td>
+          <td><code>{{.Type}}</code></td>
+          <td>{{.Desc}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+  {{if .ExampleResponse}}
+  <pre>{{.ExampleResponse}}</pre>{{end}}
+
+  {{if .Errors}}
+  <div class="section">
+    <div class="section-title">{{if eq .Lang "ru"}}Коды ошибок{{else}}Error Responses{{end}}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>{{if eq .Lang "ru"}}Статус{{else}}Status{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Тело{{else}}Body{{end}}</th>
+          <th>{{if eq .Lang "ru"}}Причина{{else}}Reason{{end}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Errors}}
+        <tr>
+          <td><code>{{.Status}}</code></td>
+          <td>{{.Body}}</td>
+          <td>{{.Reason}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{end}}
+
+</div>
+{{end}}{{/* endpoint-put */}}

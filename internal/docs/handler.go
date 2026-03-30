@@ -1,15 +1,16 @@
 package docs
 
 import (
+	"embed"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
 )
 
-type DocsHandler struct {
-	builder *DocsHandler
-}
+var templateFS embed.FS
+
+type DocsHandler struct{}
 
 func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -23,14 +24,11 @@ func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Serving docs.html")
 
-	ts, err := template.ParseFiles(
-		"../../ui/html/docs/base.tmpl",
-		"../../ui/html/docs/docs.tmpl",
-		"../../ui/html/docs/partials/get.tmpl",
-		"../../ui/html/docs/partials/post.tmpl",
-		"../../ui/html/docs/partials/put.tmpl",
-		"../../ui/html/docs/partials/patch.tmpl",
-		"../../ui/html/docs/partials/delete.tmpl",
+	ts, err := template.ParseFS(
+		templateFS,
+		"templates/base.tmpl",
+		"templates/docs.tmpl",
+		"templates/partials/*.tmpl",
 	)
 	if err != nil {
 		log.Println("template parse error:", err)
