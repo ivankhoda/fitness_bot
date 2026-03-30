@@ -15,7 +15,7 @@ func main() {
 	// 	fmt.Println("Error loading .env file")
 	// 	return
 	// }
-	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/exercises")
+	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/api/exercises")
 
 	workoutBuilder := workouts.NewWorkoutBuilder(client)
 	workoutHandler := workouts.NewWorkoutHandler(workoutBuilder)
