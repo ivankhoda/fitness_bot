@@ -26,7 +26,7 @@ func main() {
 		InfoLog:  infoLog,
 	}
 
-	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/exercises")
+	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+"/api/api/exercises")
 
 	srv := &http.Server{
 		Addr:     *addr,
