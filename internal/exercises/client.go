@@ -54,6 +54,16 @@ func buildQuery(req *http.Request, r *http.Request) {
 			q.Add("muscle_groups[]", mg)
 		}
 
+		if v := r.URL.Query().Get("limit"); v != "" {
+			q.Set("limit", v)
+		} else {
+			q.Set("limit", "3")
+		}
+
+		if v := r.URL.Query().Get("lang"); v != "" {
+			q.Add("lang", v)
+		}
+
 		if v := r.URL.Query().Get("category"); v != "" {
 			q.Add("category", v)
 		}

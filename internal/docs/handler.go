@@ -2,28 +2,30 @@ package docs
 
 import (
 	"embed"
+	"fitness_bot/internal/config"
 	"html/template"
-	"log"
 	"net/http"
 	"time"
 )
 
-//go:embed templates/base.tmpl templates/docs.tmpl templates/partials/*.tmpl
+//go:embed templates templates/partials
 var templateFS embed.FS
 
-type DocsHandler struct{}
+type DocsHandler struct {
+	app config.Application
+}
 
 func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
-		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+		h.app.ClientError(w, 405)
 		return
 	}
 	if r.URL.Path != "/docs" {
-		http.NotFound(w, r)
+		h.app.NotFound(w)
 		return
 	}
-	log.Println("Serving docs.html")
+	h.app.InfoLog.Print("Serving docs.html")
 
 	ts, err := template.ParseFS(
 		templateFS,
@@ -32,8 +34,9 @@ func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"templates/partials/*.tmpl",
 	)
 	if err != nil {
-		log.Println("template parse error:", err)
-		http.Error(w, "Internal Server Error", 500)
+		h.app.ErrorLog.Println("template parse error:", err)
+
+		h.app.ServerError(w, 500, "Internal Server Error")
 		return
 	}
 
@@ -49,12 +52,12 @@ func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
-		log.Println("template execute error:", err)
-		http.Error(w, "Internal Server Error", 500)
+		h.app.ErrorLog.Print("template execute error:", err)
+		h.app.ServerError(w, 500, "Internal Server Error")
 		return
 	}
 }
 
-func NewDocsHandler() *DocsHandler {
-	return &DocsHandler{}
+func NewDocsHandler(app config.Application) *DocsHandler {
+	return &DocsHandler{app: app}
 }

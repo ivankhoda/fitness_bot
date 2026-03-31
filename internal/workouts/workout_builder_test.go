@@ -1,6 +1,7 @@
 package workouts
 
 import (
+	"fitness_bot/internal/config"
 	"fitness_bot/internal/exercises"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +20,8 @@ func (f *FakeClient) FetchExercises(r *http.Request) ([]exercises.ExerciseRecord
 
 func TestWorkoutBuilder(t *testing.T) {
 	client := &FakeClient{}
-	builder := NewWorkoutBuilder(client)
+	app := config.Application{}
+	builder := NewWorkoutBuilder(client, app)
 	request := httptest.NewRequest(http.MethodGet, "/generate_workout", nil)
 
 	workout, err := builder.BuildWorkout(request)
