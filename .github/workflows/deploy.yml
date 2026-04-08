@@ -29,11 +29,32 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - run: |
+      - name: Copy deploy files and restart stack
+        run: |
+          DEPLOY_PATH=~/fitness_bot
+
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} \
+            "mkdir -p ${DEPLOY_PATH} && rm -rf ${DEPLOY_PATH}/migrations"
+
+          scp -o StrictHostKeyChecking=no \
+            docker-compose-bot.prod.yml \
+            ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:${DEPLOY_PATH}/
+
+          scp -o StrictHostKeyChecking=no -r \
+            migrations \
+            ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:${DEPLOY_PATH}/
+
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} << EOF
+            set -e
             export FITNESS_BOT_TAG=${{ github.sha }}
+            cd ~/fitness_bot
 
             docker pull ivankhoda/fitness:fitness_bot-${{ github.sha }}
-            docker compose -f docker-compose-bot.prod.yml up -d --force-recreate fitness_bot
+            docker compose \
+              --project-name fitness-bot \
+              --env-file .env/production/fitness_bot \
+              -f docker-compose-bot.prod.yml \
+              up -d --force-recreate
           EOF
