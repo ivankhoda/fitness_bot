@@ -31,7 +31,7 @@ jobs:
 
       - name: Copy deploy files and restart stack
         run: |
-          DEPLOY_PATH=~/fitness_bot
+          DEPLOY_PATH=/root
 
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} \
@@ -49,7 +49,7 @@ jobs:
             ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} << EOF
             set -e
             export FITNESS_BOT_TAG=${{ github.sha }}
-            cd ~/fitness_bot
+            cd /root
 
             docker pull ivankhoda/fitness:fitness_bot-${{ github.sha }}
             docker compose \
