@@ -12,7 +12,9 @@ func routes(app *config.Application, client *exercises.ExercisesClient) *http.Se
 
 	workoutBuilder := workouts.NewWorkoutBuilder(client, *app)
 	mux := http.NewServeMux()
+	mux.Handle("/exercises", exercises.NewExercisesHandler(client, app.Exercise))
 	mux.Handle("/docs", docs.NewDocsHandler(*app))
+
 	mux.Handle("/generate_workout", workouts.NewWorkoutHandler(workoutBuilder, *app))
 	return mux
 }

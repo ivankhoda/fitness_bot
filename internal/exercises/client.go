@@ -2,6 +2,7 @@ package exercises
 
 import (
 	"encoding/json"
+	"fitness_bot/internal/domain"
 	"io"
 	"net/http"
 )
@@ -11,9 +12,9 @@ type ExercisesClient struct {
 	url   string
 }
 
-func (p *ExercisesClient) FetchExercises(r *http.Request) ([]ExerciseRecord, error) {
+func (p *ExercisesClient) FetchExercises(r *http.Request) ([]domain.ExerciseRecord, error) {
 
-	var exercises []ExerciseRecord
+	var exercises []domain.ExerciseRecord
 	var err error
 
 	req, err := http.NewRequest("GET", p.url, nil)
@@ -39,6 +40,9 @@ func (p *ExercisesClient) FetchExercises(r *http.Request) ([]ExerciseRecord, err
 	}
 
 	err = json.Unmarshal(body, &exercises)
+	if err != nil {
+		return nil, err
+	}
 
 	return exercises, nil
 }
@@ -56,8 +60,6 @@ func buildQuery(req *http.Request, r *http.Request) {
 
 		if v := r.URL.Query().Get("limit"); v != "" {
 			q.Set("limit", v)
-		} else {
-			q.Set("limit", "3")
 		}
 
 		if v := r.URL.Query().Get("lang"); v != "" {
@@ -70,6 +72,10 @@ func buildQuery(req *http.Request, r *http.Request) {
 
 		if v := r.URL.Query().Get("difficulty"); v != "" {
 			q.Add("difficulty", v)
+		}
+
+		if v := r.URL.Query().Get("updated_since"); v != "" {
+			q.Set("updated_since", v)
 		}
 
 		req.URL.RawQuery = q.Encode()

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fitness_bot/internal/domain"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 type Application struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
+	Exercise domain.ExerciseRepository
 }
 
 func (app *Application) ServerError(w http.ResponseWriter, status int, message string) {

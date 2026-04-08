@@ -1,7 +1,10 @@
 package exercises
 
-import "net/http"
+import (
+	"fitness_bot/internal/domain"
+	"net/http"
+)
 
 type ExercisesFetcher interface {
-	FetchExercises(r *http.Request) ([]ExerciseRecord, error)
+	FetchExercises(r *http.Request) ([]domain.ExerciseRecord, error)
 }

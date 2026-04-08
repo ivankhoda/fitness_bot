@@ -2,21 +2,41 @@ package workouts
 
 import (
 	"fitness_bot/internal/config"
-	"fitness_bot/internal/exercises"
+	"fitness_bot/internal/domain"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 type WorkoutBuilder struct {
-	client exercises.ExercisesFetcher
+	client domain.ExercisesFetcher
 	app    *config.Application
 }
 
 func (b *WorkoutBuilder) BuildWorkout(r *http.Request) (Workout, error) {
 	var workout Workout
-	var err error
 
-	exercises, err := b.client.FetchExercises(r)
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 0
+	}
+	buildQuery(r)
+	var muscleGroups []string
+	for _, mg := range r.URL.Query()["muscle_groups[]"] {
+		for _, m := range strings.Split(mg, ",") {
+			if m = strings.TrimSpace(m); m != "" {
+				muscleGroups = append(muscleGroups, m)
+			}
+		}
+	}
+	exercises, err := b.app.Exercise.GetAll(domain.ExercsiesFilter{
+		MuscleGroups: muscleGroups,
+		Category:     r.URL.Query().Get("category"),
+		Difficulty:   r.URL.Query().Get("difficulty"),
+		Limit:        limit,
+	})
 
 	if err != nil {
 		return Workout{}, err
@@ -31,11 +51,11 @@ func (b *WorkoutBuilder) BuildWorkout(r *http.Request) (Workout, error) {
 	return workout, nil
 }
 
-func NewWorkoutBuilder(client exercises.ExercisesFetcher, app config.Application) *WorkoutBuilder {
+func NewWorkoutBuilder(client domain.ExercisesFetcher, app config.Application) *WorkoutBuilder {
 	return &WorkoutBuilder{client: client, app: &app}
 }
 
-func (b *WorkoutBuilder) DefineType(exercises []exercises.ExerciseRecord) string {
+func (b *WorkoutBuilder) DefineType(exercises []domain.ExerciseRecord) string {
 	mapCategories := make(map[string]int)
 	for _, exercise := range exercises {
 		mapCategories[exercise.Category]++
@@ -51,9 +71,9 @@ func (b *WorkoutBuilder) DefineType(exercises []exercises.ExerciseRecord) string
 	}
 
 	return maxCategory
-
 }
-func (b *WorkoutBuilder) DefineDifficulty(exercises []exercises.ExerciseRecord) string {
+
+func (b *WorkoutBuilder) DefineDifficulty(exercises []domain.ExerciseRecord) string {
 	mapDifficulty := make(map[string]int)
 	for _, exercise := range exercises {
 		if exercise.Difficulty == "advanced" {
@@ -72,5 +92,37 @@ func (b *WorkoutBuilder) DefineDifficulty(exercises []exercises.ExerciseRecord) 
 	}
 
 	return maxDifficulty
+}
 
+func buildQuery(req *http.Request) {
+	if req == nil {
+		return
+	}
+
+	q := req.URL.Query()
+	if q != nil {
+		for _, mg := range req.URL.Query()["muscle_groups[]"] {
+			q.Add("muscle_groups[]", mg)
+		}
+
+		if v := req.URL.Query().Get("limit"); v != "" {
+			q.Set("limit", v)
+		} else {
+			q.Set("limit", "3")
+		}
+
+		if v := req.URL.Query().Get("lang"); v != "" {
+			q.Add("lang", v)
+		}
+
+		if v := req.URL.Query().Get("category"); v != "" {
+			q.Add("category", v)
+		}
+
+		if v := req.URL.Query().Get("difficulty"); v != "" {
+			q.Add("difficulty", v)
+		}
+		log.Printf("Built query: %s", q.Encode())
+		req.URL.RawQuery = q.Encode()
+	}
 }

@@ -2,7 +2,7 @@ package workouts
 
 import (
 	"fitness_bot/internal/config"
-	"fitness_bot/internal/exercises"
+	"fitness_bot/internal/domain"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,8 +11,8 @@ import (
 type FakeClient struct {
 }
 
-func (f *FakeClient) FetchExercises(r *http.Request) ([]exercises.ExerciseRecord, error) {
-	return []exercises.ExerciseRecord{
+func (f *FakeClient) FetchExercises(r *http.Request) ([]domain.ExerciseRecord, error) {
+	return []domain.ExerciseRecord{
 		{UUID: "1luid", Name: "Push-up", MuscleGroups: []string{"chest"}, Difficulty: "beginner", Category: "strength"},
 		{UUID: "2xuid", Name: "Pull-up", MuscleGroups: []string{"back"}, Difficulty: "beginner", Category: "strength"},
 	}, nil

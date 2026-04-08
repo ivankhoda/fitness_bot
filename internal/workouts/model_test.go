@@ -1,7 +1,7 @@
 package workouts
 
 import (
-	"fitness_bot/internal/exercises"
+	"fitness_bot/internal/domain"
 	"testing"
 )
 
@@ -10,7 +10,7 @@ func TestWorkout(t *testing.T) {
 	workout := Workout{
 		Type:       "Cardio",
 		Difficulty: "Medium",
-		Exercises: []exercises.ExerciseRecord{
+		Exercises: []domain.ExerciseRecord{
 			{
 				Name:         "Running",
 				Description:  "Run at a steady pace for 30 minutes.",

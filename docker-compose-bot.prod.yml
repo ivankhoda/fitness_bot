@@ -1,12 +1,60 @@
-version: "3.9"
-
 services:
-  fitness_bot:
-    image: ivankhoda/fitness:fitness_bot-${FITNESS_BOT_TAG}
-    ports:
-      - "5000:5000"
+  db:
+    image: postgres:16-alpine
     env_file:
       - .env/production/fitness_bot
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - fit
+
+  migrate:
+    image: migrate/migrate:v4.18.3
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env/production/fitness_bot
+    volumes:
+      - ./migrations:/migrations:ro
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable",
+        "up"
+      ]
+    restart: "no"
+    networks:
+      - fit
+
+  fitness_bot:
+    image: ivankhoda/fitness:fitness_bot-${FITNESS_BOT_TAG}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:5000:5000"
+    env_file:
+      - .env/production/fitness_bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - EXTERNAL_PROVIDER_URL=${EXTERNAL_PROVIDER_URL}
+      - PATH_TO_EXERCISES=${PATH_TO_EXERCISES}
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
     restart: unless-stopped
     networks:
       - fit
@@ -14,4 +62,6 @@ services:
 networks:
   fit:
     driver: bridge
-    attachable: true
+
+volumes:
+  postgres_data:
