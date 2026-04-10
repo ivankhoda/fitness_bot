@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"fitness_bot/internal/domain"
@@ -74,8 +75,9 @@ func (e *ExerciseModel) GetAll(f domain.ExercsiesFilter) ([]domain.ExerciseRecor
 		argIndex++
 	}
 	query += " ORDER BY RANDOM()"
-	if f.Limit > 0 {
-		query += " LIMIT " + fmt.Sprintf("%d", f.Limit)
+	limit, err := strconv.Atoi(f.Limit)
+	if err == nil && limit > 0 {
+		query += " LIMIT " + fmt.Sprintf("%d", limit)
 	}
 
 	rows, err := e.DB.Query(context.Background(), query, args...)

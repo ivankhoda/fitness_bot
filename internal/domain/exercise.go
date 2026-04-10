@@ -34,7 +34,7 @@ type ExercsiesFilter struct {
 	MuscleGroups []string
 	Category     string
 	Difficulty   string
-	Limit        int
+	Limit        string
 }
 
 type ExercisesFetcher interface {

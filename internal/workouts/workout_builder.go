@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -18,10 +17,6 @@ type WorkoutBuilder struct {
 func (b *WorkoutBuilder) BuildWorkout(r *http.Request) (Workout, error) {
 	var workout Workout
 
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil {
-		limit = 0
-	}
 	buildQuery(r)
 	var muscleGroups []string
 	for _, mg := range r.URL.Query()["muscle_groups[]"] {
@@ -31,11 +26,12 @@ func (b *WorkoutBuilder) BuildWorkout(r *http.Request) (Workout, error) {
 			}
 		}
 	}
+
 	exercises, err := b.app.Exercise.GetAll(domain.ExercsiesFilter{
 		MuscleGroups: muscleGroups,
 		Category:     r.URL.Query().Get("category"),
 		Difficulty:   r.URL.Query().Get("difficulty"),
-		Limit:        limit,
+		Limit:        r.URL.Query().Get("limit"),
 	})
 
 	if err != nil {
