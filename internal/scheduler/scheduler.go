@@ -36,7 +36,7 @@ func (s *Scheduler) Stop() {
 }
 
 func (s *Scheduler) registerJobs() error {
-	_, err := s.cron.AddFunc("0 */1 * * * *", func() {
+	_, err := s.cron.AddFunc("0 0 0 * * *", func() {
 		_ = s.syncExercisesService.Run()
 	})
 	return err

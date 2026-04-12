@@ -26,7 +26,6 @@ func (b *WorkoutBuilder) BuildWorkout(r *http.Request) (Workout, error) {
 			}
 		}
 	}
-
 	exercises, err := b.app.Exercise.GetAll(domain.ExercsiesFilter{
 		MuscleGroups: muscleGroups,
 		Category:     r.URL.Query().Get("category"),
