@@ -43,7 +43,7 @@ func main() {
 	}
 
 	syncStateStore := scheduler.NewSyncStateStore(db)
-	syncExercisesService := scheduler.NewSyncExercisesService(client, app.Exercise, syncStateStore, infoLog, errorLog)
+	syncExercisesService := scheduler.NewSyncExercisesService(client, app.Exercise, syncStateStore, app)
 	infoLog.Printf("Starting initial sync of exercises")
 	if err := syncExercisesService.Run(); err != nil {
 		errorLog.Printf("initial exercise sync failed: %v", err)
