@@ -1,30 +1,28 @@
 package scheduler
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"fitness_bot/internal/config"
 	"fitness_bot/internal/domain"
 )
 
 type SyncExercisesService struct {
-	fetcher  domain.ExercisesFetcher
-	repo     domain.ExerciseRepository
-	state    SyncCheckpointStore
-	infoLog  *log.Logger
-	errorLog *log.Logger
+	fetcher domain.ExercisesFetcher
+	repo    domain.ExerciseRepository
+	state   SyncCheckpointStore
+	app     *config.Application
 }
 
-func NewSyncExercisesService(fetcher domain.ExercisesFetcher, repo domain.ExerciseRepository, state SyncCheckpointStore, infoLog, errorLog *log.Logger) *SyncExercisesService {
+func NewSyncExercisesService(fetcher domain.ExercisesFetcher, repo domain.ExerciseRepository, state SyncCheckpointStore, app *config.Application) *SyncExercisesService {
 	return &SyncExercisesService{
-		fetcher:  fetcher,
-		repo:     repo,
-		state:    state,
-		infoLog:  infoLog,
-		errorLog: errorLog,
+		fetcher: fetcher,
+		repo:    repo,
+		state:   state,
+		app:     app,
 	}
 }
 
@@ -40,8 +38,8 @@ func (service *SyncExercisesService) Run() error {
 		since = nil
 	}
 
-	if service.infoLog != nil {
-		service.infoLog.Printf("starting exercise sync, since=%v", since)
+	if service.app.InfoLog != nil {
+		service.app.InfoLog.Printf("starting exercise sync, since=%v", since)
 	}
 
 	exercises, err := service.fetcher.FetchExercises(newSyncRequest(since))
@@ -56,7 +54,7 @@ func (service *SyncExercisesService) Run() error {
 			service.logError(err)
 			return err
 		}
-		service.infoLog.Println(exercise.UUID, exercise.Name, exercise.UpdatedAt)
+		service.app.InfoLog.Println(exercise.UUID, exercise.Name, exercise.UpdatedAt)
 		if exercise.UpdatedAt != nil && (maxUpdatedAt == nil || exercise.UpdatedAt.After(*maxUpdatedAt)) {
 			updatedAt := *exercise.UpdatedAt
 			maxUpdatedAt = &updatedAt
@@ -74,22 +72,22 @@ func (service *SyncExercisesService) Run() error {
 		}
 	}
 
-	if service.infoLog != nil {
-		service.infoLog.Printf("exercise sync completed, processed=%d", len(exercises))
+	if service.app.InfoLog != nil {
+		service.app.InfoLog.Printf("exercise sync completed, processed=%d", len(exercises))
 	}
 
 	return nil
 }
 
 func (service *SyncExercisesService) logError(err error) {
-	if service.errorLog != nil {
-		service.errorLog.Printf("exercise sync failed: %v", err)
+	if service.app.ErrorLog != nil {
+		service.app.ErrorLog.Printf("exercise sync failed: %v", err)
 	}
 }
 
 func (service *SyncExercisesService) logWarning(format string, args ...any) {
-	if service.infoLog != nil {
-		service.infoLog.Printf(format, args...)
+	if service.app.InfoLog != nil {
+		service.app.InfoLog.Printf(format, args...)
 	}
 }
 

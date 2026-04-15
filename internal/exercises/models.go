@@ -106,7 +106,13 @@ func (e *ExerciseModel) GetAll(f domain.ExercsiesFilter) ([]domain.ExerciseRecor
 }
 
 func (e *ExerciseModel) GetByID(id int) (*domain.ExerciseRecord, error) {
-	return nil, nil
+	var exercise domain.ExerciseRecord
+	err := e.DB.QueryRow(context.Background(), "SELECT external_uuid, name, description, muscle_groups, difficulty, category FROM exercises WHERE id = $1", id).Scan(&exercise.UUID, &exercise.Name, &exercise.Description, &exercise.MuscleGroups, &exercise.Difficulty, &exercise.Category)
+	if err != nil {
+		log.Printf("Error fetching exercise by ID: %v", err)
+		return nil, err
+	}
+	return &exercise, nil
 }
 
 func (e *ExerciseModel) GetByUUID(uuid string) (*domain.ExerciseRecord, error) {

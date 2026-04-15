@@ -13,16 +13,6 @@ type WorkoutHandler struct {
 }
 
 func (h *WorkoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.Header().Set("Allow", http.MethodGet)
-		h.app.ErrorLog.Print("Method is not allowed:", r.Method)
-		h.app.ServerError(w, http.StatusMethodNotAllowed, "Method is not allowed")
-		return
-	}
-	if r.URL.Path != "/generate_workout" {
-		h.app.NotFound(w)
-		return
-	}
 	workout, err := h.builder.BuildWorkout(r)
 
 	if err != nil {

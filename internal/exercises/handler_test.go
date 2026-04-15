@@ -50,9 +50,8 @@ func (f *FakeRepository) Save(exercise domain.ExerciseRecord) error {
 func TestExercisesHandler(t *testing.T) {
 
 	w := httptest.NewRecorder()
-	fakeClient := &FakeClient{}
 	fakeRepository := &FakeRepository{}
-	handler := NewExercisesHandler(fakeClient, fakeRepository)
+	handler := NewExercisesHandler(fakeRepository)
 
 	req := newGetExerciseRequest([]string{"chest", "back"}, "beginner", "strength")
 

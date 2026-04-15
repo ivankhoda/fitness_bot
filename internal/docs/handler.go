@@ -4,11 +4,12 @@ import (
 	"embed"
 	"fitness_bot/internal/config"
 	"html/template"
+	"io/fs"
 	"net/http"
 	"time"
 )
 
-//go:embed templates templates/partials
+//go:embed templates templates/partials assets
 var templateFS embed.FS
 
 type DocsHandler struct {
@@ -16,15 +17,6 @@ type DocsHandler struct {
 }
 
 func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.Header().Set("Allow", http.MethodGet)
-		h.app.ClientError(w, 405)
-		return
-	}
-	if r.URL.Path != "/docs" {
-		h.app.NotFound(w)
-		return
-	}
 	h.app.InfoLog.Print("Serving docs.html")
 
 	ts, err := template.ParseFS(
@@ -60,4 +52,13 @@ func (h *DocsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func NewDocsHandler(app config.Application) *DocsHandler {
 	return &DocsHandler{app: app}
+}
+
+func NewAssetsHandler() http.Handler {
+	assetsFS, err := fs.Sub(templateFS, "assets")
+	if err != nil {
+		panic(err)
+	}
+
+	return http.FileServer(http.FS(assetsFS))
 }
