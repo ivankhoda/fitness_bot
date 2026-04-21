@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 type Application struct {
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-	Exercise domain.ExerciseRepository
+	ErrorLog       *log.Logger
+	InfoLog        *log.Logger
+	Exercise       domain.ExerciseRepository
+	SessionManager *scs.SessionManager
 }
 
 func (app *Application) ServerError(w http.ResponseWriter, status int, message string) {

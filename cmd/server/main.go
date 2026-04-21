@@ -11,6 +11,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/alexedwards/scs/pgxstore"
+	"github.com/alexedwards/scs/v2"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -36,10 +40,16 @@ func main() {
 		errorLog.Fatal(dBerr)
 	}
 	defer db.Close()
+
+	sessionManager := scs.New()
+	sessionManager.Store = pgxstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	app := &config.Application{
-		ErrorLog: errorLog,
-		InfoLog:  infoLog,
-		Exercise: &exercises.ExerciseModel{DB: db},
+		ErrorLog:       errorLog,
+		InfoLog:        infoLog,
+		Exercise:       &exercises.ExerciseModel{DB: db},
+		SessionManager: sessionManager,
 	}
 
 	syncStateStore := scheduler.NewSyncStateStore(db)
@@ -55,9 +65,12 @@ func main() {
 	defer jobScheduler.Stop()
 
 	srv := &http.Server{
-		Addr:     *addr,
-		ErrorLog: errorLog,
-		Handler:  routes(app, client),
+		Addr:         *addr,
+		ErrorLog:     errorLog,
+		Handler:      routes(app, client),
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	app.InfoLog.Printf("Starting server on %s", *addr)

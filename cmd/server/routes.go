@@ -24,7 +24,8 @@ func routes(app *config.Application, client *exercises.ExercisesClient) http.Han
 
 	router.Handler(http.MethodGet, "/docs", docs.NewDocsHandler(*app))
 	router.Handler(http.MethodGet, "/generate_workout", workouts.NewWorkoutHandler(workoutBuilder, *app))
+	router.Handler(http.MethodGet, "/debug/session", workouts.NewSessionDebugHandler(*app))
 
-	standart := alice.New(app.RecoverPanic, app.LogRequest, secureHeaders)
+	standart := alice.New(app.RecoverPanic, app.LogRequest, secureHeaders, app.SessionManager.LoadAndSave)
 	return standart.Then(router)
 }
