@@ -36,6 +36,7 @@ func main() {
 
 	exercisesAPIURL := exercisesAPIURLFromEnv()
 	infoLog.Printf("Using exercises API endpoint: %s", exercisesAPIURL)
+	infoLog.Printf("Using database DSN: %s", *dsn)
 	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), exercisesAPIURL)
 
 	db, dBerr := pgxpool.New(context.Background(), *dsn)
