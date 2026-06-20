@@ -38,7 +38,7 @@ func (service *SyncExercisesService) Run() error {
 		since = nil
 	}
 
-	if service.app.InfoLog != nil {
+	if service.app != nil && service.app.InfoLog != nil {
 		service.app.InfoLog.Printf("starting exercise sync, since=%v", since)
 	}
 
@@ -54,7 +54,9 @@ func (service *SyncExercisesService) Run() error {
 			service.logError(err)
 			return err
 		}
-		service.app.InfoLog.Println(exercise.UUID, exercise.Name, exercise.UpdatedAt)
+		if service.app != nil && service.app.InfoLog != nil {
+			service.app.InfoLog.Println(exercise.UUID, exercise.Name, exercise.UpdatedAt)
+		}
 		if exercise.UpdatedAt != nil && (maxUpdatedAt == nil || exercise.UpdatedAt.After(*maxUpdatedAt)) {
 			updatedAt := *exercise.UpdatedAt
 			maxUpdatedAt = &updatedAt
@@ -72,7 +74,7 @@ func (service *SyncExercisesService) Run() error {
 		}
 	}
 
-	if service.app.InfoLog != nil {
+	if service.app != nil && service.app.InfoLog != nil {
 		service.app.InfoLog.Printf("exercise sync completed, processed=%d", len(exercises))
 	}
 
@@ -80,13 +82,13 @@ func (service *SyncExercisesService) Run() error {
 }
 
 func (service *SyncExercisesService) logError(err error) {
-	if service.app.ErrorLog != nil {
+	if service.app != nil && service.app.ErrorLog != nil {
 		service.app.ErrorLog.Printf("exercise sync failed: %v", err)
 	}
 }
 
 func (service *SyncExercisesService) logWarning(format string, args ...any) {
-	if service.app.InfoLog != nil {
+	if service.app != nil && service.app.InfoLog != nil {
 		service.app.InfoLog.Printf(format, args...)
 	}
 }

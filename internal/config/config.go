@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fitness_bot/internal/domain"
+	"fitness_bot/internal/models"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,7 +12,7 @@ import (
 type Application struct {
 	ErrorLog       *log.Logger
 	InfoLog        *log.Logger
-	Exercise       domain.ExerciseRepository
+	Exercise       models.ExerciseModelInterface
 	SessionManager *scs.SessionManager
 }
 

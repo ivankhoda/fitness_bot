@@ -4,6 +4,7 @@ import (
 	"context"
 	"fitness_bot/internal/config"
 	"fitness_bot/internal/exercises"
+	"fitness_bot/internal/models"
 	"fitness_bot/internal/scheduler"
 	"flag"
 	"fmt"
@@ -48,7 +49,7 @@ func main() {
 	app := &config.Application{
 		ErrorLog:       errorLog,
 		InfoLog:        infoLog,
-		Exercise:       &exercises.ExerciseModel{DB: db},
+		Exercise:       &models.ExerciseModel{DB: db},
 		SessionManager: sessionManager,
 	}
 

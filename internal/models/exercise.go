@@ -1,4 +1,4 @@
-package exercises
+package models
 
 import (
 	"context"
@@ -11,6 +11,17 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type ExerciseModelInterface interface {
+	Insert(exercise domain.ExerciseRecord) (int, error)
+	Exists(uuid string) (bool, error)
+	Upsert(exercise domain.ExerciseRecord) error
+	GetAll(f domain.ExercsiesFilter) ([]domain.ExerciseRecord, error)
+	GetByID(id int) (*domain.ExerciseRecord, error)
+	GetByUUID(uuid string) (*domain.ExerciseRecord, error)
+	Update(id int, exercise domain.ExerciseRecord) error
+	Delete(id int) error
+}
 
 type ExerciseModel struct {
 	DB *pgxpool.Pool
@@ -123,6 +134,16 @@ func (e *ExerciseModel) GetByUUID(uuid string) (*domain.ExerciseRecord, error) {
 		return nil, err
 	}
 	return &exercise, nil
+}
+
+func (e *ExerciseModel) Exists(uuid string) (bool, error) {
+	var exists bool
+	err := e.DB.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM exercises WHERE external_uuid = $1)", uuid).Scan(&exists)
+	if err != nil {
+		log.Printf("Error checking exercise existence: %v", err)
+		return false, err
+	}
+	return exists, nil
 }
 
 func (e *ExerciseModel) Update(id int, exercise domain.ExerciseRecord) error {

@@ -20,6 +20,10 @@ type WorkoutHandler struct {
 	app     *config.Application
 }
 
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
+}
+
 func (h *WorkoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	workout, err := h.builder.BuildWorkout(r)
 

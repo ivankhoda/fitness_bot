@@ -2,6 +2,7 @@ package exercises
 
 import (
 	"encoding/json"
+	"fitness_bot/internal/assert"
 	"fitness_bot/internal/domain"
 	"fmt"
 	"log"
@@ -28,7 +29,10 @@ func (f *FakeRepository) Delete(id int) error {
 }
 
 func (f *FakeRepository) GetAll(filter domain.ExercsiesFilter) ([]domain.ExerciseRecord, error) {
-	panic("unimplemented")
+	return []domain.ExerciseRecord{
+		{UUID: "1", Name: "Push-up", MuscleGroups: []string{"chest"}, Difficulty: "beginner", Category: "strength"},
+		{UUID: "2", Name: "Pull-up", MuscleGroups: []string{"back"}, Difficulty: "beginner", Category: "strength"},
+	}, nil
 }
 
 func (f *FakeRepository) GetByID(id int) (*domain.ExerciseRecord, error) {
@@ -99,19 +103,7 @@ func getExercisesFromResponse(t testing.TB, response *httptest.ResponseRecorder)
 
 func assertResponseBody(t testing.TB, got, want domain.ExerciseRecord) {
 	t.Helper()
-	if got.UUID != want.UUID || got.Name != want.Name || got.Difficulty != want.Difficulty || got.Category != want.Category || !slicesEqual(got.MuscleGroups, want.MuscleGroups) {
+	if got.UUID != want.UUID || got.Name != want.Name || got.Difficulty != want.Difficulty || got.Category != want.Category || !assert.SlicesEqual(got.MuscleGroups, want.MuscleGroups) {
 		t.Errorf("response body is wrong, got %+v want %+v", got, want)
 	}
-}
-
-func slicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
 }

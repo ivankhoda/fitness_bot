@@ -3,8 +3,10 @@ package exercises
 import (
 	"encoding/json"
 	"fitness_bot/internal/domain"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type ExercisesClient struct {
@@ -39,9 +41,13 @@ func (p *ExercisesClient) FetchExercises(r *http.Request) ([]domain.ExerciseReco
 		return nil, err
 	}
 
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("upstream exercises API returned %s: %s", resp.Status, previewBody(body))
+	}
+
 	err = json.Unmarshal(body, &exercises)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode exercises API response as JSON: %w; response preview: %s", err, previewBody(body))
 	}
 
 	return exercises, nil
@@ -84,4 +90,18 @@ func buildQuery(req *http.Request, r *http.Request) {
 
 func NewExercisesClient(token, url string) *ExercisesClient {
 	return &ExercisesClient{token: token, url: url}
+}
+
+func previewBody(body []byte) string {
+	trimmed := strings.TrimSpace(string(body))
+	if trimmed == "" {
+		return "<empty>"
+	}
+
+	const maxPreviewLen = 240
+	if len(trimmed) > maxPreviewLen {
+		return trimmed[:maxPreviewLen] + "..."
+	}
+
+	return trimmed
 }
