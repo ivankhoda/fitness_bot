@@ -34,7 +34,9 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), os.Getenv("EXTERNAL_PROVIDER_URL")+os.Getenv("PATH_TO_EXERCISES"))
+	exercisesAPIURL := exercisesAPIURLFromEnv()
+	infoLog.Printf("Using exercises API endpoint: %s", exercisesAPIURL)
+	client := exercises.NewExercisesClient(os.Getenv("BOT_TOKEN"), exercisesAPIURL)
 
 	db, dBerr := pgxpool.New(context.Background(), *dsn)
 	if dBerr != nil {
@@ -103,4 +105,26 @@ func databaseURLFromEnv() string {
 		os.Getenv("POSTGRES_DB"),
 		sslMode,
 	)
+}
+
+func exercisesAPIURLFromEnv() string {
+	baseURL := normalizeEnvValue(os.Getenv("EXTERNAL_PROVIDER_URL"))
+	path := normalizeEnvValue(os.Getenv("PATH_TO_EXERCISES"))
+
+	if baseURL == "" {
+		return path
+	}
+
+	if path == "" {
+		return baseURL
+	}
+
+	return strings.TrimRight(baseURL, "/") + "/" + strings.TrimLeft(path, "/")
+}
+
+func normalizeEnvValue(value string) string {
+	trimmed := strings.TrimSpace(value)
+	trimmed = strings.Trim(trimmed, `"`)
+	trimmed = strings.Trim(trimmed, `'`)
+	return strings.TrimSpace(trimmed)
 }

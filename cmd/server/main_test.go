@@ -89,3 +89,43 @@ func TestDBConnectionStringWithEnv(t *testing.T) {
 	}
 	defer db.Close()
 }
+
+func TestExercisesAPIURLFromEnv_Table(t *testing.T) {
+	tests := []struct {
+		name string
+		base string
+		path string
+		want string
+	}{
+		{
+			name: "joins base and path with single slash",
+			base: "https://api.example.com",
+			path: "/api/exercises",
+			want: "https://api.example.com/api/exercises",
+		},
+		{
+			name: "trims surrounding quotes and spaces",
+			base: `  "https://api.example.com/"  `,
+			path: `  '/api/exercises'  `,
+			want: "https://api.example.com/api/exercises",
+		},
+		{
+			name: "returns base when path empty",
+			base: "https://api.example.com/exercises",
+			path: "",
+			want: "https://api.example.com/exercises",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("EXTERNAL_PROVIDER_URL", tt.base)
+			t.Setenv("PATH_TO_EXERCISES", tt.path)
+
+			got := exercisesAPIURLFromEnv()
+			if got != tt.want {
+				t.Fatalf("expected %q, got %q", tt.want, got)
+			}
+		})
+	}
+}
